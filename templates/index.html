@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Classify Tweets</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <link rel="icon" href="https://i.imgur.com/0nRu6Yj.jpg" type="image/png">
+    <style>
+        body {
+            background-color: #343a40;
+            color: #fff;
+        }
+
+        .container {
+            margin-top: 50px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        label {
+            font-weight: bold;
+        }
+
+        #classify-form {
+            text-align: center;
+        }
+
+        #results {
+            margin-top: 30px;
+        }
+        
+        .tweet-card {
+            background-color: #212529;
+            color: #fff;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 5px; /* Add the border-radius property to make the cards rounded */
+        }
+        
+        .tweet-card p {
+            margin-bottom: 10px;
+        }
+        
+        .tweet-card a {
+            color: #fff;
+            text-decoration: none;
+        }
+        
+        .site-description {
+            background-color: #212529;
+            color: #fff;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 5px; /* Add the border-radius property to make the cards rounded */
+        }
+        
+        .site-description p {
+            margin-bottom: 10px;
+        }
+        
+        .background-div {
+            background-image: url("https://i.imgur.com/1NljMxX.png");
+            background-repeat: no-repeat;
+            background-size: cover;
+            min-height: 100px;
+            width: 100px;
+            margin: 0 auto;
+            padding: 20px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="background-div"></div>
+        <h1>Classify Tweets</h1>
+        
+        <div class="site-description rounded">
+            <p>
+                Test an AI-powered algorithm that classifies tweets as positive or negative. Enter the keywords and let our AI classify them. 🤖 <br><br> This is <b>NOT</b> the official Twitter algorithm and may contain occasional classification errors.
+            </p>
+        </div>
+        
+        <form id="classify-form">
+            <div class="form-row justify-content-center">
+                <div class="form-group mx-sm-3 mb-2">
+                    <label for="keywords">Keywords:</label>
+                    <input type="text" class="form-control" id="keywords" name="keywords">
+                </div>
+            </div>
+            <div class="text-center">
+                <button type="submit" class="btn btn-outline-info mt-2">Classify!</button>
+            </div>
+        </form>
+
+        <div id="results"></div>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            $('#classify-form').submit(function(event) {
+                event.preventDefault();
+                var keywords = $('#keywords').val();
+
+                $.ajax({
+                    url: '/classify',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ keywords: keywords }),
+                    success: function(response) {
+                        displayResults(response);
+                    }
+                });
+            });
+
+            function displayResults(results) {
+                var resultsDiv = $('#results');
+                resultsDiv.empty();
+
+                for (var i = 0; i < results.length; i++) {
+                    var result = results[i];
+
+                    var tweetCard = $('<div>').addClass('tweet-card rounded'); // Add the "rounded" class to make the cards rounded
+                    var tweetContent = $('<p>').text('Tweet Content: ' + result.tweet_content);
+                    var positiveProbability = $('<p>').text('Positive Probability: ' + result.positive_probability);
+                    var negativeProbability = $('<p>').text('Negative Probability: ' + result.negative_probability);
+                    var classificationResult = $('<p>').text('Result: ' + result.result);
+                    var modelAccuracy = $('<p>').text('Model Accuracy: ' + result.model_accuracy);
+
+                    tweetCard.append(tweetContent, positiveProbability, negativeProbability, classificationResult, modelAccuracy);
+                    resultsDiv.append(tweetCard);
+                }
+            }
+        });
+    </script>
+</body>
+</html>

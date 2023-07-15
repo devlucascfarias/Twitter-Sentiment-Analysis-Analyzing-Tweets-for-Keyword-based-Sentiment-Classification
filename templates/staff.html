@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Staff Panel</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <link rel="icon" href="https://i.imgur.com/0nRu6Yj.jpg" type="image/png">
+    <style>
+        body {
+            background-color: #343a40;
+            color: #fff;
+        }
+
+        .container {
+            margin-top: 50px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        label {
+            font-weight: bold;
+        }
+
+        #add-form {
+            text-align: center;
+        }
+
+        #status {
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Add Phrases</h1>
+
+        <form id="add-form">
+            <div class="form-row justify-content-center">
+                <div class="form-group mx-sm-3 mb-2">
+                    <label for="positive-phrase">Positive Phrase:</label>
+                    <input type="text" class="form-control" id="positive-phrase" name="positive-phrase">
+                </div>
+            </div>
+            <div class="form-row justify-content-center">
+                <div class="form-group mx-sm-3 mb-2">
+                    <label for="negative-phrase">Negative Phrase:</label>
+                    <input type="text" class="form-control" id="negative-phrase" name="negative-phrase">
+                </div>
+            </div>
+            <div class="text-center">
+                <button type="submit" class="btn btn-outline-info mt-2">Add</button>
+            </div>
+        </form>
+
+        <div id="status"></div>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            $('#add-form').submit(function(event) {
+                event.preventDefault();
+                var positivePhrase = $('#positive-phrase').val();
+                var negativePhrase = $('#negative-phrase').val();
+
+                $.ajax({
+                    url: '/add_phrases',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        positivePhrase: positivePhrase,
+                        negativePhrase: negativePhrase
+                    }),
+                    success: function(response) {
+                        displayStatus(response);
+                    }
+                });
+            });
+
+            function displayStatus(response) {
+                var statusDiv = $('#status');
+                statusDiv.empty();
+
+                var statusMessage = $('<p>').text(response.message);
+
+                if (response.success) {
+                    statusMessage.addClass('text-success');
+                } else {
+                    statusMessage.addClass('text-danger');
+                }
+
+                statusDiv.append(statusMessage);
+            }
+        });
+    </script>
+</body>
+</html>
